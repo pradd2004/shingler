@@ -1,173 +1,173 @@
-<?php
+ï»¿<?php
 
 class Shingler
 {
-	private $minWords;
-	private $text;
-	private $words;
-	private $wordsAmount;
+    private $minWords;
+    private $text;
+    private $words;
+    private $wordsAmount;
 
-	private static $stopWords = array(
-		'áåç', "áåçî", "áëèç", "â", "âî", "âìåñòî", "âíå", "äëÿ", "äî", "çà", "èç", "èçî", "èç-çà", "èç-ïîä", "ê", "êî", "êðîìå", "ìåæäó", "ìåæ", "íà", "íàä", "íàäî", "î", "îá", "îáî", "îò", "îòî", "ïåðåä", "ïåðåäî", 'ïðåä', 'ïðåäî', 'ïo', 'ïîä', 'ïîäî', 'ïðè', 'ïðî', 'ðàäè', 'ñ', 'ñî', 'ñêâîçü', 'ñðåäè', 'ó', '÷åðåç', '÷ðåç', "èç çà", "èç ïîä", 'è', 'à', 'íî', 'äà', 'èëè', 'òàêæå', 'òîæå', '÷òîáû', 'çàòî', 'îòòîãî', 'ïîýòîìó', 'èòàê', 'íåóæåëè', 'íå', 'äàæå', 'êòî-íèáóäü', '÷òî-ëèáî', 'êòî-òî', 'êîå-÷òî', 'ãäå-òî', 'êòî íèáóäü', '÷òî ëèáî', 'êòî òî', 'êîå ÷òî', 'ãäå òî', 'ðàçâå', 'íåóæåëè', 'ëè', '÷òî çà', 'êàê', 'äàæå', 'óæå', 'óæ', 'è', 'âåäü', 'âîò', 'òî', 'æå', 'íè', 'òîëüêî', 'ëèøü', 'äà', 'íåò', 'îõ', 'àõ', 'óðà', 'îé', 'ï³ñëÿ', 'ïðîòè', 'ì³æ', 'íàâêîëî', 'ÿê', 'íèæ÷å', 'ïîçà', 'ïîðó÷', 'ì³æ', 'àëå', 'íåçâàæàþ÷è', 'âèíÿòêîì', 'â³ä', 'âñåðåäèí³', 'áëèçüêî', 'íàñòóïíèé', 'ç', 'ìåæàìè', 'í³æ', 'äî', 'ï³ä', 'öå', 'òå', 'ö³', 'ò³'
-	);
-	
-	private static $same = array(
-		'¸' => 'å', 'é' => 'è',
-	);
+    private static $stopWords = array(
+        'Ð±ÐµÐ·', "Ð±ÐµÐ·Ð¾", "Ð±Ð»Ð¸Ð·", "Ð²", "Ð²Ð¾", "Ð²Ð¼ÐµÑÑ‚Ð¾", "Ð²Ð½Ðµ", "Ð´Ð»Ñ", "Ð´Ð¾", "Ð·Ð°", "Ð¸Ð·", "Ð¸Ð·Ð¾", "Ð¸Ð·-Ð·Ð°", "Ð¸Ð·-Ð¿Ð¾Ð´", "Ðº", "ÐºÐ¾", "ÐºÑ€Ð¾Ð¼Ðµ", "Ð¼ÐµÐ¶Ð´Ñƒ", "Ð¼ÐµÐ¶", "Ð½Ð°", "Ð½Ð°Ð´", "Ð½Ð°Ð´Ð¾", "Ð¾", "Ð¾Ð±", "Ð¾Ð±Ð¾", "Ð¾Ñ‚", "Ð¾Ñ‚Ð¾", "Ð¿ÐµÑ€ÐµÐ´", "Ð¿ÐµÑ€ÐµÐ´Ð¾", 'Ð¿Ñ€ÐµÐ´', 'Ð¿Ñ€ÐµÐ´Ð¾', 'Ð¿o', 'Ð¿Ð¾Ð´', 'Ð¿Ð¾Ð´Ð¾', 'Ð¿Ñ€Ð¸', 'Ð¿Ñ€Ð¾', 'Ñ€Ð°Ð´Ð¸', 'Ñ', 'ÑÐ¾', 'ÑÐºÐ²Ð¾Ð·ÑŒ', 'ÑÑ€ÐµÐ´Ð¸', 'Ñƒ', 'Ñ‡ÐµÑ€ÐµÐ·', 'Ñ‡Ñ€ÐµÐ·', "Ð¸Ð· Ð·Ð°", "Ð¸Ð· Ð¿Ð¾Ð´", 'Ð¸', 'Ð°', 'Ð½Ð¾', 'Ð´Ð°', 'Ð¸Ð»Ð¸', 'Ñ‚Ð°ÐºÐ¶Ðµ', 'Ñ‚Ð¾Ð¶Ðµ', 'Ñ‡Ñ‚Ð¾Ð±Ñ‹', 'Ð·Ð°Ñ‚Ð¾', 'Ð¾Ñ‚Ñ‚Ð¾Ð³Ð¾', 'Ð¿Ð¾ÑÑ‚Ð¾Ð¼Ñƒ', 'Ð¸Ñ‚Ð°Ðº', 'Ð½ÐµÑƒÐ¶ÐµÐ»Ð¸', 'Ð½Ðµ', 'Ð´Ð°Ð¶Ðµ', 'ÐºÑ‚Ð¾-Ð½Ð¸Ð±ÑƒÐ´ÑŒ', 'Ñ‡Ñ‚Ð¾-Ð»Ð¸Ð±Ð¾', 'ÐºÑ‚Ð¾-Ñ‚Ð¾', 'ÐºÐ¾Ðµ-Ñ‡Ñ‚Ð¾', 'Ð³Ð´Ðµ-Ñ‚Ð¾', 'ÐºÑ‚Ð¾ Ð½Ð¸Ð±ÑƒÐ´ÑŒ', 'Ñ‡Ñ‚Ð¾ Ð»Ð¸Ð±Ð¾', 'ÐºÑ‚Ð¾ Ñ‚Ð¾', 'ÐºÐ¾Ðµ Ñ‡Ñ‚Ð¾', 'Ð³Ð´Ðµ Ñ‚Ð¾', 'Ñ€Ð°Ð·Ð²Ðµ', 'Ð½ÐµÑƒÐ¶ÐµÐ»Ð¸', 'Ð»Ð¸', 'Ñ‡Ñ‚Ð¾ Ð·Ð°', 'ÐºÐ°Ðº', 'Ð´Ð°Ð¶Ðµ', 'ÑƒÐ¶Ðµ', 'ÑƒÐ¶', 'Ð¸', 'Ð²ÐµÐ´ÑŒ', 'Ð²Ð¾Ñ‚', 'Ñ‚Ð¾', 'Ð¶Ðµ', 'Ð½Ð¸', 'Ñ‚Ð¾Ð»ÑŒÐºÐ¾', 'Ð»Ð¸ÑˆÑŒ', 'Ð´Ð°', 'Ð½ÐµÑ‚', 'Ð¾Ñ…', 'Ð°Ñ…', 'ÑƒÑ€Ð°', 'Ð¾Ð¹', 'Ð¿Ñ–ÑÐ»Ñ', 'Ð¿Ñ€Ð¾Ñ‚Ð¸', 'Ð¼Ñ–Ð¶', 'Ð½Ð°Ð²ÐºÐ¾Ð»Ð¾', 'ÑÐº', 'Ð½Ð¸Ð¶Ñ‡Ðµ', 'Ð¿Ð¾Ð·Ð°', 'Ð¿Ð¾Ñ€ÑƒÑ‡', 'Ð¼Ñ–Ð¶', 'Ð°Ð»Ðµ', 'Ð½ÐµÐ·Ð²Ð°Ð¶Ð°ÑŽÑ‡Ð¸', 'Ð²Ð¸Ð½ÑÑ‚ÐºÐ¾Ð¼', 'Ð²Ñ–Ð´', 'Ð²ÑÐµÑ€ÐµÐ´Ð¸Ð½Ñ–', 'Ð±Ð»Ð¸Ð·ÑŒÐºÐ¾', 'Ð½Ð°ÑÑ‚ÑƒÐ¿Ð½Ð¸Ð¹', 'Ð·', 'Ð¼ÐµÐ¶Ð°Ð¼Ð¸', 'Ð½Ñ–Ð¶', 'Ð´Ð¾', 'Ð¿Ñ–Ð´', 'Ñ†Ðµ', 'Ñ‚Ðµ', 'Ñ†Ñ–', 'Ñ‚Ñ–'
+    );
+    
+    private static $same = array(
+        'Ñ‘' => 'Ðµ', 'Ð¹' => 'Ð¸',
+    );
 
-	private function replaceSameLetters()
-	{
-		$this->text = str_replace(array_keys(self::$same), array_values(self::$same), $this->text);
-		return $this;
-	}
+    private function replaceSameLetters()
+    {
+        $this->text = str_replace(array_keys(self::$same), array_values(self::$same), $this->text);
+        return $this;
+    }
 
-	private function normalize()
-	{
-		$this->prepareText()
-			->removeStopWords()
-			->removeNonLetters()
-			->replaceSameLetters()
-			->removeControlChars();
-	}
-	
-	private function prepareText() 
-	{
-		$this->text = trim(strtolower($this->text));
-		return $this;
-	}
+    private function normalize()
+    {
+        $this->prepareText()
+            ->removeStopWords()
+            ->removeNonLetters()
+            ->replaceSameLetters()
+            ->removeControlChars();
+    }
+    
+    private function prepareText() 
+    {
+        $this->text = trim(strtolower($this->text));
+        return $this;
+    }
 
-	private function removeStopWords()
-	{
-		$pattern = '/\b(?:' . join('|', self::$stopWords) . ')\b/i';
-		$this->text = preg_replace($pattern, '', $this->text);
-		return $this;
-	}
+    private function removeStopWords()
+    {
+        $pattern = '/\b(?:' . join('|', self::$stopWords) . ')\b/i';
+        $this->text = preg_replace($pattern, '', $this->text);
+        return $this;
+    }
 
-	private function splitByWords()
-	{
-		$this->text = preg_split('/[^a-zA-Zà-ÿÀ-ß¿¯ºª¥´²³¸¨]+/', $this->text, null, PREG_SPLIT_NO_EMPTY);
-		return $this;
-	}
+    private function splitByWords()
+    {
+        $this->text = preg_split('/[^a-zA-ZÐ°-ÑÐ-Ð¯Ñ—Ð‡Ñ”Ð„ÒÒ‘Ð†Ñ–Ñ‘Ð]+/', $this->text, null, PREG_SPLIT_NO_EMPTY);
+        return $this;
+    }
 
-	private function removeControlChars()
-	{
-		$this->text = preg_replace('/\s+/', ' ', $this->text);
-		return $this;
-	}
+    private function removeControlChars()
+    {
+        $this->text = preg_replace('/\s+/', ' ', $this->text);
+        return $this;
+    }
 
-	private function removeNonLetters()
-	{
-		$pattern = '/[^à-ÿÀ-ßa-zA-Z¥´ªº²³¯¿¸¨\s]/';
-		$replacement = ' ';
-		$this->text = preg_replace($pattern, $replacement, $this->text);
-		return $this;
-	}
+    private function removeNonLetters()
+    {
+        $pattern = '/[^Ð°-ÑÐ-Ð¯a-zA-ZÒÒ‘Ð„Ñ”Ð†Ñ–Ð‡Ñ—Ñ‘Ð\s]/';
+        $replacement = ' ';
+        $this->text = preg_replace($pattern, $replacement, $this->text);
+        return $this;
+    }
 
-	public function __construct($minWords = 3, $text = '')
-	{
-		$minWords = (int) $minWords;
-		$minWords = $minWords > 0 ? $minWords : 3;
-		$this->minWords = $minWords;
-		$this->text = (string) $text;
-		
-		$this->normalize();
-		
-		$this->words = explode(' ', $this->text, -1);
-		$this->wordsAmount = count($this->words);
-	}
+    public function __construct($minWords = 3, $text = '')
+    {
+        $minWords = (int) $minWords;
+        $minWords = $minWords > 0 ? $minWords : 3;
+        $this->minWords = $minWords;
+        $this->text = (string) $text;
+        
+        $this->normalize();
+        
+        $this->words = explode(' ', $this->text, -1);
+        $this->wordsAmount = count($this->words);
+    }
 
-	/*
-	 * Generate all possible shingles from text based on $this->minWords amount. Shingle's difference is 1 word
-	 * Example with minWords = 3: 
-	 * $text = "Search the world information including webpages images videos"
-	 *  Search the world,
-	 *  the world information,
-	 *  world information including,
-	 *  information including webpages,
-	 *  including webpages images,
-	 *  webpages images videos
-	 */
+    /*
+     * Generate all possible shingles from text based on $this->minWords amount. Shingle's difference is 1 word
+     * Example with minWords = 3: 
+     * $text = "Search the world information including webpages images videos"
+     *  Search the world,
+     *  the world information,
+     *  world information including,
+     *  information including webpages,
+     *  including webpages images,
+     *  webpages images videos
+     */
 
-	public function generateShingles($writeTail = false)
-	{
-		$shingles = array();
-		
-		if (empty($this->text) || $this->wordsAmount == 0) {
-			return $shingles;
-		}
-		
-		if ($writeTail && $this->wordsAmount <= $this->minWords) {
-			return implode('', $this->words);
-		}
-		
-		$wordsSequence = '';
-		for ($i = 0; $i <= $this->wordsAmount - $this->minWords; $i++) {
-			$wordsSequence = '';
-			for ($j = $this->minWords; $j > 0; $j--) {
-				$wordPos = $i + $this->minWords - $j;
-				$wordsSequence .= $this->words[$wordPos];
-			}
-			$shingles[] = $wordsSequence;
-		}
-		if ($writeTail && !empty($wordsSequence)) {
-			$shingles[] = $wordsSequence;
-		}
-		return $shingles;
-	}
+    public function generateShingles($writeTail = false)
+    {
+        $shingles = array();
+        
+        if (empty($this->text) || $this->wordsAmount == 0) {
+            return $shingles;
+        }
+        
+        if ($writeTail && $this->wordsAmount <= $this->minWords) {
+            return implode('', $this->words);
+        }
+        
+        $wordsSequence = '';
+        for ($i = 0; $i <= $this->wordsAmount - $this->minWords; $i++) {
+            $wordsSequence = '';
+            for ($j = $this->minWords; $j > 0; $j--) {
+                $wordPos = $i + $this->minWords - $j;
+                $wordsSequence .= $this->words[$wordPos];
+            }
+            $shingles[] = $wordsSequence;
+        }
+        if ($writeTail && !empty($wordsSequence)) {
+            $shingles[] = $wordsSequence;
+        }
+        return $shingles;
+    }
 
-	
-	/*
-	 * Generate lapped shingles from text based on $this->minWords amount. Shingle's difference is last word
-	 * Example with minWords = 4: 
-	 * $text = "Search the world information including webpages images videos"
-	 *  Search the world information,
-	 *  information including webpages images,
-	 */
-	public function generateLappedShingles($writeTail = false)
-	{
-		$shingles = array();
-		if (empty($this->text) || $this->wordsAmount <= $this->minWords) {
-			return $shingles;
-		}
-		$wordsSequence = '';
-		for ($i = 0; $i <= $this->wordsAmount - $this->minWords; $i += $this->minWords - 1) {
-			$wordsSequence = '';
-			for ($j = 0; $j < $this->minWords; $j++) {
-				$wordPos = $i + $j;
-				$wordsSequence .= $this->words[$wordPos];
-			}
-			$shingles[] = $wordsSequence;
-		}
-		if ($writeTail && !empty($wordsSequence)) {
-			$shingles[] = $wordsSequence;
-		}
-		return $shingles;
-	}
+    
+    /*
+     * Generate lapped shingles from text based on $this->minWords amount. Shingle's difference is last word
+     * Example with minWords = 4: 
+     * $text = "Search the world information including webpages images videos"
+     *  Search the world information,
+     *  information including webpages images,
+     */
+    public function generateLappedShingles($writeTail = false)
+    {
+        $shingles = array();
+        if (empty($this->text) || $this->wordsAmount <= $this->minWords) {
+            return $shingles;
+        }
+        $wordsSequence = '';
+        for ($i = 0; $i <= $this->wordsAmount - $this->minWords; $i += $this->minWords - 1) {
+            $wordsSequence = '';
+            for ($j = 0; $j < $this->minWords; $j++) {
+                $wordPos = $i + $j;
+                $wordsSequence .= $this->words[$wordPos];
+            }
+            $shingles[] = $wordsSequence;
+        }
+        if ($writeTail && !empty($wordsSequence)) {
+            $shingles[] = $wordsSequence;
+        }
+        return $shingles;
+    }
 
-	/*
-	 * Generate joint shingles from text based on $this->minWords amount.
-	 * Example with minWords = 3: 
-	 * $text = "Search the world information including webpages images videos"
-	 *  Search the world,
-	 *  information including webpages,
-	 *  images videos
-	 */
+    /*
+     * Generate joint shingles from text based on $this->minWords amount.
+     * Example with minWords = 3: 
+     * $text = "Search the world information including webpages images videos"
+     *  Search the world,
+     *  information including webpages,
+     *  images videos
+     */
 
-	public function generateJointShingles($writeTail = false)
-	{
-		$shingles = array();
-		$wordsSequence = '';
-		for ($i = 0; $i < $this->wordsAmount; $i++) {
-			$wordsSequence .= $this->words[$i];
-			if ($i % $this->minWords == $this->minWords - 1 && !empty($wordsSequence)) {
-				$shingles[] = $wordsSequence;
-				$wordsSequence = '';
-			}
-			if ($writeTail && !empty($wordsSequence) && $i == $this->wordsAmount - 1) {
-				$shingles[] = $wordsSequence;
-			}
-		}
-		return $shingles;
-	}
+    public function generateJointShingles($writeTail = false)
+    {
+        $shingles = array();
+        $wordsSequence = '';
+        for ($i = 0; $i < $this->wordsAmount; $i++) {
+            $wordsSequence .= $this->words[$i];
+            if ($i % $this->minWords == $this->minWords - 1 && !empty($wordsSequence)) {
+                $shingles[] = $wordsSequence;
+                $wordsSequence = '';
+            }
+            if ($writeTail && !empty($wordsSequence) && $i == $this->wordsAmount - 1) {
+                $shingles[] = $wordsSequence;
+            }
+        }
+        return $shingles;
+    }
 
 }

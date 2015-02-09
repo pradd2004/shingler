@@ -2,13 +2,13 @@
 
 class Shingler
 {
-    private $minWords;
     private $text;
     private $words;
+    private $minWords;
     private $wordsAmount;
 
     private static $stopWords = array(
-        'без', "безо", "близ", "в", "во", "вместо", "вне", "для", "до", "за", "из", "изо", "из-за", "из-под", "к", "ко", "кроме", "между", "меж", "на", "над", "надо", "о", "об", "обо", "от", "ото", "перед", "передо", 'пред', 'предо', 'пo', 'под', 'подо', 'при', 'про', 'ради', 'с', 'со', 'сквозь', 'среди', 'у', 'через', 'чрез', "из за", "из под", 'и', 'а', 'но', 'да', 'или', 'также', 'тоже', 'чтобы', 'зато', 'оттого', 'поэтому', 'итак', 'неужели', 'не', 'даже', 'кто-нибудь', 'что-либо', 'кто-то', 'кое-что', 'где-то', 'кто нибудь', 'что либо', 'кто то', 'кое что', 'где то', 'разве', 'неужели', 'ли', 'что за', 'как', 'даже', 'уже', 'уж', 'и', 'ведь', 'вот', 'то', 'же', 'ни', 'только', 'лишь', 'да', 'нет', 'ох', 'ах', 'ура', 'ой', 'після', 'проти', 'між', 'навколо', 'як', 'нижче', 'поза', 'поруч', 'між', 'але', 'незважаючи', 'винятком', 'від', 'всередині', 'близько', 'наступний', 'з', 'межами', 'ніж', 'до', 'під', 'це', 'те', 'ці', 'ті'
+        'без', "безо", "близ", "в", "во", "вместо", "вне", "для", "до", "за", "из", "изо", "из-за", "из-под", "к", "ко", "кроме", "между", "меж", "на", "над", "надо", "о", "об", "обо", "от", "ото", "перед", "передо", 'пред', 'предо', 'пo', 'под', 'подо', 'при', 'про', 'ради', 'с', 'со', 'сквозь', 'среди', 'у', 'через', 'чрез', "из за", "из под", 'и', 'а', 'но', 'да', 'или', 'также', 'тоже', 'чтобы', 'зато', 'оттого', 'поэтому', 'итак', 'неужели', 'не', 'даже', 'кто-нибудь', 'что-либо', 'кто-то', 'кое-что', 'где-то', 'кто нибудь', 'что либо', 'кто то', 'кое что', 'где то', 'разве', 'неужели', 'ли', 'что за', 'как', 'даже', 'уже', 'уж', 'и', 'ведь', 'вот', 'то', 'же', 'ни', 'только', 'лишь', 'да', 'нет', 'ох', 'ах', 'ура', 'ой', 'після', 'проти', 'між', 'навколо', 'як', 'нижче', 'поза', 'поруч', 'між', 'але', 'незважаючи', 'винятком', 'від', 'всередині', 'близько', 'наступний', 'з', 'межами', 'ніж', 'до', 'під', 'це', 'те', 'ці', 'ті',
     );
     
     private static $same = array(
@@ -101,10 +101,12 @@ class Shingler
         }
         
         $wordsSequence = '';
-        for ($i = 0; $i <= $this->wordsAmount - $this->minWords; $i++) {
+        $lastShinglePos = $this->wordsAmount - $this->minWords;
+        for ($i = 0; $i <= $lastShinglePos; $i++) {
             $wordsSequence = '';
+            $endPos = $i + $this->minWords;
             for ($j = $this->minWords; $j > 0; $j--) {
-                $wordPos = $i + $this->minWords - $j;
+                $wordPos = $endPos - $j;
                 $wordsSequence .= $this->words[$wordPos];
             }
             $shingles[] = $wordsSequence;
@@ -130,7 +132,9 @@ class Shingler
             return $shingles;
         }
         $wordsSequence = '';
-        for ($i = 0; $i <= $this->wordsAmount - $this->minWords; $i += $this->minWords - 1) {
+        $step = $this->minWords - 1;
+        $lastShinglePos = $this->wordsAmount - $this->minWords;
+        for ($i = 0; $i <= $lastShinglePos; $i += $step) {
             $wordsSequence = '';
             for ($j = 0; $j < $this->minWords; $j++) {
                 $wordPos = $i + $j;
@@ -157,13 +161,15 @@ class Shingler
     {
         $shingles = array();
         $wordsSequence = '';
+        $shinglePartEnd = $this->minWords - 1;
+        $lastWordIndex = $this->wordsAmount - 1;
         for ($i = 0; $i < $this->wordsAmount; $i++) {
             $wordsSequence .= $this->words[$i];
-            if ($i % $this->minWords == $this->minWords - 1 && !empty($wordsSequence)) {
+            if ($i % $this->minWords == $shinglePartEnd && !empty($wordsSequence)) {
                 $shingles[] = $wordsSequence;
                 $wordsSequence = '';
             }
-            if ($writeTail && !empty($wordsSequence) && $i == $this->wordsAmount - 1) {
+            if ($writeTail && !empty($wordsSequence) && $i == $lastWordIndex) {
                 $shingles[] = $wordsSequence;
             }
         }
